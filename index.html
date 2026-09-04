@@ -584,7 +584,7 @@
 <script>
 /* Abre WhatsApp con una plantilla lista para completar y enviar. */
 function openWhatsAppAppointment() {
-  const message = `¡Hola! Quiero apartar una cita en Frenos La Amistad.\n\nNombre:\nVehículo (marca):\nModelo / año:\nNúmero de celular:\nServicio que necesito (opcional):`;
+  const message = `¡Hola! Quiero apartar una cita en Frenos La Amistad.\n\nNombre:\nVehículo (marca):\nModelo / año:\nNúmero de celular:\nServicio que necesito:`;
   const url = 'https://api.whatsapp.com/send?phone=573213536368&text=' + encodeURIComponent(message);
   window.open(url, '_blank', 'noopener');
 }
