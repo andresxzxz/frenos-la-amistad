@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Frenos La Amistad — Taller de frenos en Bogotá</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #17181b;
+    --surface: #1f2124;
+    --surface-raised: #292b2f;
+    --line: #383a3e;
+    --red: #d54430;
+    --red-dark: #9c3223;
+    --brass: #c7a24a;
+    --text: #eeece6;
+    --text-dim: #97999d;
+    --warn: #e0a33d;
+    --warn-bg: #3a2f1a;
+    --ok: #7fa06a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Work Sans', sans-serif;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    line-height: 1.05;
+  }
+
+  a { color: inherit; }
+
+  .container {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(23,24,27,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+  .nav-logo {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .nav-logo span { color: var(--red); }
+  .nav-links { display: flex; gap: 26px; font-size: 14.5px; }
+  .nav-links a { text-decoration: none; color: var(--text-dim); transition: color 0.15s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--red);
+    color: #fff;
+    padding: 9px 18px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-cta:hover { background: var(--red-dark); }
+  .nav-admin-mobile {
+    display: none;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-admin-mobile:hover { border-color: var(--red); }
+
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+    .nav-inner { gap: 10px; padding: 12px 24px; }
+    .nav-admin-mobile { display: inline-flex; }
+    .nav-cta { padding: 9px 12px; font-size: 13px; }
+  }
+  @media (max-width: 480px) {
+    .nav-inner { flex-wrap: wrap; }
+    .nav-logo { flex: 1 0 100%; }
+    .nav-admin-mobile, .nav-cta { flex: 1; justify-content: center; }
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: 90px 24px 70px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 5vw, 52px);
+    margin-bottom: 18px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--red);
+  }
+  .hero p.lead {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 40ch;
+    margin-bottom: 30px;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-red:hover { background: var(--red-dark); }
+  .btn-outline { background: transparent; border-color: var(--line); color: var(--text); }
+  .btn-outline:hover { border-color: var(--text-dim); }
+
+  .disc-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .disc {
+    width: min(280px, 100%);
+    animation: spin 40s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .disc { animation: none; }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 780px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .disc-wrap { order: -1; }
+    .disc { width: 160px; }
+  }
+
+  /* STRIP */
+  .strip {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 26px 24px;
+  }
+  .strip-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .strip-item { display: flex; gap: 14px; align-items: flex-start; }
+  .strip-item .num {
+    font-family: 'Oswald';
+    font-size: 26px;
+    color: var(--red);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .strip-item .lbl { font-size: 13.5px; color: var(--text-dim); margin-top: 4px; }
+  .strip-item .val { font-size: 15px; font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .strip-inner { grid-template-columns: 1fr; gap: 18px; }
+  }
+
+  /* SECTION GENERIC */
+  section { padding: 70px 24px; }
+  .section-head { max-width: 560px; margin-bottom: 40px; }
+  .section-head h2 { font-size: 30px; margin-bottom: 10px; }
+  .section-head p { color: var(--text-dim); font-size: 15.5px; }
+
+  /* SERVICIOS */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .service-card {
+    background: var(--bg);
+    padding: 30px 28px;
+  }
+  .service-card h3 {
+    font-size: 19px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .service-card h3::before {
+    content: "";
+    width: 8px; height: 8px;
+    background: var(--red);
+    display: inline-block;
+    border-radius: 1px;
+  }
+  .service-card p { color: var(--text-dim); font-size: 14.5px; }
+
+  @media (max-width: 640px) {
+    .services-grid { grid-template-columns: 1fr; }
+  }
+
+  /* GARANTIA */
+  .warranty {
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .warranty .container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 34px;
+    align-items: center;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+  .warranty-badge {
+    width: 96px; height: 96px;
+    border: 3px solid var(--brass);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--brass);
+    font-family: 'Oswald';
+    flex-shrink: 0;
+  }
+  .warranty-badge .n { font-size: 26px; font-weight: 700; line-height: 1; }
+  .warranty-badge .d { font-size: 10.5px; letter-spacing: 0.03em; }
+  .warranty h2 { font-size: 24px; margin-bottom: 8px; }
+  .warranty p { color: var(--text-dim); font-size: 15px; max-width: 56ch; }
+
+  @media (max-width: 600px) {
+    .warranty .container { grid-template-columns: 1fr; text-align: left; }
+  }
+
+  /* CONTACTO */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 44px;
+  }
+  .contact-block h3 {
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .contact-block .value {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 26px;
+  }
+  .contact-block a.value { text-decoration: none; }
+  .contact-block a.value:hover { color: var(--red); }
+
+  .hours-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .hours-table td { padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .hours-table td:first-child { color: var(--text-dim); }
+  .hours-table td:last-child { text-align: right; font-weight: 600; }
+
+  @media (max-width: 640px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 30px 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13.5px;
+  }
+  footer b { color: var(--text); }
+
+  /* ===== ADMIN ===== */
+  .admin-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,9,7,0.78);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .admin-modal {
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 380px;
+    padding: 30px;
+  }
+  .admin-modal h2 {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+  .admin-modal .sub { color: var(--text-dim); font-size: 14px; margin-bottom: 22px; }
+  .admin-name-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 6px; }
+  .admin-name-btn {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 13px 16px;
+    border-radius: 6px;
+    text-align: left;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .admin-name-btn span.role { color: var(--text-dim); font-weight: 500; font-size: 12.5px; }
+  .admin-name-btn:hover { border-color: var(--red); }
+
+  .admin-field { margin-bottom: 14px; }
+  .admin-field label { display: block; font-size: 12.5px; color: var(--text-dim); margin-bottom: 6px; font-weight: 600; }
+  .admin-field input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 18px;
+    letter-spacing: 0.2em;
+    text-align: center;
+  }
+  .admin-field input:focus { outline: none; border-color: var(--red); }
+  .admin-field input:invalid { box-shadow: none; }
+  .admin-error { color: var(--red); font-size: 13px; margin-bottom: 12px; min-height: 16px; }
+  .admin-modal-actions { display: flex; gap: 8px; margin-top: 6px; }
+  .admin-modal-actions .btn { flex: 1; justify-content: center; }
+  .admin-back { background: none; border: none; color: var(--text-dim); font-size: 13px; cursor: pointer; margin-top: 16px; font-family: inherit; }
+  .admin-back:hover { color: var(--text); }
+
+  /* Admin panel (post-login) */
+  .admin-panel {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 90;
+    overflow-y: auto;
+  }
+  .admin-panel-inner { max-width: 900px; margin: 0 auto; padding: 26px 22px 70px; }
+  .admin-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 22px; flex-wrap: wrap; gap: 12px;
+  }
+  .admin-header h1 { font-size: 22px; }
+  .admin-header .who { color: var(--text-dim); font-size: 13.5px; margin-top: 3px; }
+  .admin-header .who b { color: var(--brass); }
+  .logout-btn {
+    background: var(--surface); border: 1px solid var(--line); color: var(--text-dim);
+    padding: 9px 16px; border-radius: 6px; font-family: inherit; font-size: 13.5px; cursor: pointer;
+  }
+  .logout-btn:hover { border-color: var(--red); color: var(--text); }
+
+  .admin-toolbar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .admin-tabs { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .admin-tab {
+    background: none; border: none; border-bottom: 2px solid var(--red);
+    color: var(--text); padding: 0 4px 10px; font-family: inherit;
+    font-size: 14px; font-weight: 700;
+  }
+  .admin-search {
+    flex: 1; min-width: 200px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+    padding: 11px 14px; color: var(--text); font-family: inherit; font-size: 14px;
+  }
+  .admin-search:focus { outline: none; border-color: var(--red); }
+
+  .stock-row {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; margin-bottom: 8px;
+    display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: center;
+  }
+  .stock-row.low { border-color: var(--warn); background: linear-gradient(180deg, var(--warn-bg), var(--surface) 45%); }
+  .stock-row .name { font-weight: 700; font-size: 15px; }
+  .stock-row .meta { color: var(--text-dim); font-size: 12.5px; margin-top: 3px; }
+  .stock-row .meta span:not(:first-child)::before { content: "·"; margin: 0 8px; color: var(--line); }
+  .stock-qty { text-align: right; min-width: 80px; }
+  .stock-qty b { font-family: 'Oswald'; font-size: 20px; display: block; }
+  .stock-qty b.low { color: var(--warn); }
+  .stock-qty .u { font-size: 11px; color: var(--text-dim); }
+  .stock-price { text-align: right; min-width: 90px; font-size: 12.5px; color: var(--text-dim); }
+  .stock-price b { display: block; color: var(--text); font-size: 13.5px; }
+  .stock-row-actions { display: flex; gap: 6px; }
+  .admin-empty { text-align: center; padding: 60px 20px; color: var(--text-dim); border: 1px dashed var(--line); border-radius: 8px; }
+
+  @media (max-width: 600px) {
+    .stock-row { grid-template-columns: 1fr; }
+    .stock-qty, .stock-price { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">FRENOS <span>LA AMISTAD</span></div>
+    <div class="nav-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#garantia">Garantía</a>
+      <a href="#contacto">Contacto</a>
+      <a href="#" onclick="openAdmin(); return false;" style="color: var(--text-dim);">Administración</a>
+    </div>
+    <a class="nav-admin-mobile" href="#" onclick="openAdmin(); return false;">Administración</a>
+    <a class="nav-cta" href="https://wa.me/573213536368" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>+20 años de experiencia cuidando tus frenos en <em>Bogotá</em></h1>
+      <p class="lead">Reparación mecánica general con enfoque en frenos de calidad, hechos por gente que lleva dos décadas debajo del carro.</p>
+      <div class="hero-actions">
+        <a class="btn btn-red" href="https://wa.me/573213536368" target="_blank" rel="noopener">Agendar por WhatsApp</a>
+        <a class="btn btn-outline" href="#contacto">Ver ubicación y horario</a>
+      </div>
+    </div>
+    <div class="disc-wrap">
+      <svg class="disc" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="94" fill="none" stroke="#383a3e" stroke-width="2"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#383a3e" stroke-width="1"/>
+        <circle cx="100" cy="100" r="34" fill="none" stroke="#d54430" stroke-width="3"/>
+        <circle cx="100" cy="100" r="8" fill="#c7a24a"/>
+        <g stroke="#383a3e" stroke-width="6" stroke-linecap="round">
+          <line x1="100" y1="24" x2="100" y2="42"/>
+          <line x1="100" y1="158" x2="100" y2="176"/>
+          <line x1="24" y1="100" x2="42" y2="100"/>
+          <line x1="158" y1="100" x2="176" y2="100"/>
+          <line x1="45" y1="45" x2="58" y2="58"/>
+          <line x1="142" y1="142" x2="155" y2="155"/>
+          <line x1="45" y1="155" x2="58" y2="142"/>
+          <line x1="142" y1="58" x2="155" y2="45"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="strip">
+  <div class="strip-inner">
+    <div class="strip-item">
+      <div class="num">20+</div>
+      <div>
+        <div class="val">Años de experiencia</div>
+        <div class="lbl">Trabajando frenos en Bogotá</div>
+      </div>
+    </div>
+    <div class="strip-item">
+      <div class="num">30</div>
+      <div>
+        <div class="val">Días de garantía</div>
+        <div class="lbl">Con tu factura de compra</div>
+      </div>
+    </div>
+    <div class="strip-item">
+      <div class="num">7am–7pm</div>
+      <div>
+        <div class="val">Lun a sáb</div>
+        <div class="lbl">Domingos de 8am a 6pm</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="servicios">
+  <div class="section-head">
+    <h2>Qué hacemos</h2>
+    <p>Reparación mecánica general, con la mejor calidad en frenos como nuestra especialidad.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <h3>Sistema de frenos</h3>
+      <p>Pastillas, discos, bandas, cilindros y líquido de frenos, con repuestos de calidad y mano de obra de 20 años de experiencia.</p>
+    </div>
+    <div class="service-card">
+      <h3>Mecánica general</h3>
+      <p>Diagnóstico y reparación de fallas mecánicas comunes, mantenimiento preventivo y revisión antes de viajar.</p>
+    </div>
+    <div class="service-card">
+      <h3>Revisión antes de comprar</h3>
+      <p>¿Vas a comprar un carro usado? Te ayudamos a revisar el estado mecánico antes de cerrar el negocio.</p>
+    </div>
+    <div class="service-card">
+      <h3>Asesoría sin compromiso</h3>
+      <p>Si no estás seguro de qué le pasa a tu carro, cuéntanos por WhatsApp y te orientamos antes de que vengas al taller.</p>
+    </div>
+  </div>
+</section>
+
+<div class="warranty" id="garantia">
+  <div class="container">
+    <div class="warranty-badge">
+      <div class="n">30</div>
+      <div class="d">DÍAS</div>
+    </div>
+    <div>
+      <h2>Garantía real, con factura</h2>
+      <p>Todo trabajo de frenos que hacemos queda cubierto por 30 días de garantía, siempre y cuando conserves tu factura de compra. Trabajamos con repuestos de la mejor calidad para que ese frenazo de emergencia no te deje a pie.</p>
+    </div>
+  </div>
+</div>
+
+<section id="contacto">
+  <div class="section-head">
+    <h2>Visítanos o escríbenos</h2>
+    <p>Estamos en Bogotá, listos para atenderte de lunes a domingo.</p>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-block">
+      <h3>Dirección</h3>
+      <a class="value" href="https://www.google.com/maps/search/?api=1&query=Carrera+79c+bis+%232-21+Bogot%C3%A1" target="_blank" rel="noopener" style="display:block;">
+        Carrera 79c bis #2-21, Bogotá D.C.
+      </a>
+
+      <h3>Teléfono / WhatsApp</h3>
+      <a class="value" href="https://wa.me/573213536368" target="_blank" rel="noopener">321 353 6368</a>
+    </div>
+    <div class="contact-block">
+      <h3>Horario de atención</h3>
+      <table class="hours-table">
+        <tr><td>Lunes a sábado</td><td>7:00 am – 7:00 pm</td></tr>
+        <tr><td>Domingos</td><td>8:00 am – 6:00 pm</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>Frenos La Amistad</b> · Carrera 79c bis #2-21, Bogotá D.C. · 321 353 6368
+</footer>
+
+<div id="adminRoot"></div>
+
+<script>
+/* ================= ADMINISTRACIÓN ================= */
+const DEFAULT_ACCOUNTS = [
+  { name: 'Nelson', role: 'admin', roleLabel: 'CEO', pin: null },
+  { name: 'Paola', role: 'admin', roleLabel: 'Gerente General', pin: null },
+  { name: 'Grillo', role: 'employee', roleLabel: 'Empleado', pin: null }
+];
+
+let accounts = [];
+let items = [];
+let movements = [];
+let currentUser = null; // { name, role, roleLabel }
+
+let loginStep = null; // 'select' | 'setpin' | 'enterpin'
+let loginSelected = null;
+let loginError = '';
+
+let itemModal = null; // { item }
+let moveModal = null; // { item }
+let adminSearch = '';
+let toastMessage = '';
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+/* Catálogo inicial identificado en las fotos de las estanterías D1-D23.
+   Cantidad = número de cajas contadas en la foto para esa referencia.
+   Precios se dejan en blanco: revísalos y complétalos en el panel. */
+const SEED_ITEMS = [
+  ["Pastilla freno Ref. 007 (Renault 21 / Taimiso)", "D1", 6],
+  ["Pastilla freno Incolbest Novex Ref. 7076 FF", "D2", 2],
+  ["Pastilla freno Brake USA Ref. 7076-USA-SEM (Mitsubishi Montero 84-89)", "D2", 1],
+  ["Pastilla freno Ref. 7118 (Novex/Incolbest)", "D2", 1],
+  ["Pastilla freno LPB Ref. 7514/D636", "D2", 1],
+  ["Pastilla freno Ref. 10230 (LPB)", "D3", 3],
+  ["Pastilla freno Incolbest Novex Ref. 7767 FF", "D4", 2],
+  ["Pastilla freno Ref. BPD1604 (Kia Carnival / Hyundai Veracruz / Sedona trasera)", "D4", 1],
+  ["Pastilla freno Brake Pak Ref. 8379BP (Kia Sorento)", "D4", 2],
+  ["Pastilla freno Tramelco/Meister Ref. MPH44OS (Hyundai Sonata)", "D5", 1],
+  ["Pastilla freno Comfort (Kia Gran Carnival 2.7/3.0) — ref. poco legible", "D5", 1],
+  ["Pastilla freno IPB Ref. 7209-D280", "D6", 2],
+  ["Pastilla freno F.F. Renosa Ref. 10225-72", "D7", 3],
+  ["Pastilla freno Toyota/Lexus — sin ref. numérica visible", "D7", 1],
+  ["Pastilla freno Powerplus Ref. 8212-D1107 (Volkswagen)", "D8", 2],
+  ["Pastilla freno BEX-USA Ref. WVA23743/44-23428 (Mercedes Benz E320)", "D8", 1],
+  ["Pastilla freno Incolbest Novex Ref. 8212 FF", "D8", 1],
+  ["Pastilla freno Ref. 10236-0520-E8138 (Ford / Mazda)", "D9", 2],
+  ["Pastilla freno KTC Ref. K1813-CR (Hyundai Tucson / Kia Sportage)", "D9", 1],
+  ["Pastilla freno KTC Ref. K1036-COF (Chevrolet Optra trasera)", "D9", 1],
+  ["Pastilla freno KTC Ref. K1315-CR (Chevrolet Optra)", "D9", 1],
+  ["Pastilla freno Ref. BPD1604... (Jac Taxi / Citroën / Peugeot)", "D10", 1],
+  ["Pastilla freno EVO Ref. 4106087130 (Renault Megane II / Laguna II)", "D10", 1],
+  ["Pastilla freno Brake USA Ref. 3559-USA-CER (Seat Córdoba / Skoda Fabia / Octavia / VW Cross Polo)", "D10", 3],
+  ["Pastilla freno Renosa Ref. 8818-D1604 (Jac Smile delantera)", "D11", 1],
+  ["Pastilla freno Renosa Ref. 10226-72", "D11", 1],
+  ["Pastilla freno Renosa Ref. 10238-72", "D11", 1],
+  ["Pastilla freno Brake Pak Ref. 10232BP (Kia Rio)", "D12", 1],
+  ["Pastilla freno Remsa Silver Ref. MKD1051 / I7955M", "D12", 2],
+  ["Pastilla freno Incolbest Novex Ref. 7250 FF", "D13", 3],
+  ["Pastilla freno IPB Ref. 7250/D444", "D13", 1],
+  ["Pastilla freno BEX-USA Ref. 7921-D1018H Heavy Duty (Audi A4/A6, VW Transporter)", "D14", 1],
+  ["Pastilla freno Forwell Ref. FOR-602-7482 (Terios / Lancer)", "D14", 1],
+  ["Pastilla freno Ceramic+Titanium Ref. 7482-D602 (Daihatsu Terios)", "D14", 1],
+  ["Pastilla freno IPB Ref. 7483/D602", "D14", 1],
+  ["Pastilla freno Brake Pak Ref. 8397BPH / D1281", "D15", 1],
+  ["Pastilla freno IPB Ref. 7280A-D392", "D15", 1],
+  ["Pastilla freno Incolbest Ref. 7113", "D15", 1],
+  ["Pastilla freno Incolbest Ref. 1436668 (Ford Ranger)", "D15", 1],
+  ["Pastilla freno Tramelco Carbon Max Ref. BPD1175 (Ford)", "D15", 1],
+  ["Pastilla freno Ref. 7408-D527 (Toyota Previa)", "D16", 1],
+  ["Pastilla freno BEX-USA Ref. 9471-D2232H Heavy Duty (Ford Explorer trasera)", "D16", 1],
+  ["Pastilla freno Brake USA Ref. 7331-D451 (Chevrolet Swift 1.3 / Hyundai / Tata)", "D16", 1],
+  ["Pastilla freno Bapco Ref. 7463-D583 (Kia Caenes / Mazda Matsuri Millenio)", "D16", 2],
+  ["Pastilla freno Brake USA Ref. 7463 Cerámica (Mazda 626 / Matsuri)", "D16", 1],
+  ["Pastilla freno Brake USA Ref. D2272 (Suzuki Ertiga)", "D17", 1],
+  ["Pastilla freno Brake USA Ref. D242 / 7153 (Toyota Corolla / Camry / Celica / Starlet)", "D17", 2],
+  ["Pastilla freno Brake USA Ref. 072-E12275 (Skoda Felicia / Favorit)", "D17", 1],
+  ["Pastilla freno Incolbest Ref. 7103 Extra", "D18", 3],
+  ["Pastilla freno Incolbest Ref. 7242 (Fiat Palio 1997)", "D18", 1],
+  ["Pastilla freno Brake USA Ref. 7242-D350 Cerámica (VW Gol 1.8 / Fiat)", "D18", 2],
+  ["Pastilla freno BEX-USA Ref. 8595-D1444F Comfort (Kia Optima)", "D19", 1],
+  ["Pastilla freno Ref. D1815-9049 (Kia Gran...)", "D19", 2],
+  ["Pastilla freno PG Plus Ref. PGD974AM / 7887-974", "D19", 1],
+  ["Pastilla freno Incolbest Ref. 728 A FF", "D19", 1],
+  ["Pastilla freno Gamax Ref. 123961", "D20", 1],
+  ["Pastilla freno Brake USA Ref. 7569-D694 (Skoda Fabia / VW Manhattan 19mm)", "D20", 1],
+  ["Pastilla freno Brake USA Ref. 7220-D320 (Mazda B2000 / B2600)", "D20", 2],
+  ["Pastilla freno Gamax Ref. 8667 FF / 0501", "D20", 1],
+  ["Pastilla freno Brake USA Ref. 7560-D681 (BMW 540i 95-03 delantera)", "D21", 1],
+  ["Pastilla freno Brake USA Ref. 8730-D1497/D1522 (Chevrolet Sonic / Cruze / Astra / Tracker)", "D21", 1],
+  ["Pastilla freno Brake USA Ref. 8667-D1467 (Chevrolet Tracker / Cruze / Orlando / Volt)", "D21", 1],
+  ["Pastilla freno Incolbest fórmula cerámica — sin ref. visible", "D21", 1],
+  ["Pastilla freno Brake USA Ref. 8400-D1202 (Hyundai Santa Fe delantera)", "D22", 1],
+  ["Pastilla freno Brake Pak Ref. 3568BPH", "D22", 2],
+  ["Pastilla freno Brake USA Ref. 7947-D1044 (Ford Focus II / Ecosport 4x4 / Mazda 3 / Volvo C70-S40)", "D22", 1],
+  ["Pastilla freno Premium Metallic Ref. 7265-D376 (Chevrolet Lumina / Buick / Pontiac Gran Prix)", "D23", 2]
+];
+
+function buildSeedItems() {
+  return SEED_ITEMS.map(([name, location, quantity]) => ({
+    id: uid(),
+    name,
+    category: 'Pastillas de freno',
+    location,
+    quantity,
+    minStock: 1,
+    unit: 'caja',
+    buyPrice: '',
+    sellPrice: ''
+  }));
+}
+function escapeHtml(s) {
+  return (s || '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtMoney(n) {
+  if (n === undefined || n === null || n === '') return '—';
+  return '$' + Number(n).toLocaleString('es-CO');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+window.addEventListener('error', (ev) => {
+  console.error('Error en el panel de administración:', ev.message);
+});
+window.addEventListener('unhandledrejection', (ev) => {
+  console.error('Error en el panel de administración:', ev.reason);
+});
+
+async function storageSetRetry(key, value, shared, retries) {
+  retries = retries === undefined ? 2 : retries;
+  // En una página publicada normalmente no existe window.storage. En ese
+  // caso guardamos en el navegador para que el inicio de sesión funcione.
+  if (!window.storage || typeof window.storage.set !== 'function') {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      console.error('No se pudo guardar "' + key + '" localmente', e);
+      return null;
+    }
+  }
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      await window.storage.set(key, value, shared);
+      return true;
+    } catch (e) {
+      if (attempt === retries) {
+        console.error('No se pudo guardar "' + key + '" tras varios intentos', e);
+        return null;
+      }
+      await sleep(400 * (attempt + 1));
+    }
+  }
+  return null;
+}
+
+async function storageGetSafe(key, shared) {
+  if (!window.storage || typeof window.storage.get !== 'function') {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.error('No se pudo leer "' + key + '" localmente', e);
+      return null;
+    }
+  }
+  try {
+    const res = await window.storage.get(key, shared);
+    return res ? res.value : null;
+  } catch (e) {
+    return null; // la clave no existe todavía, o falla puntual de lectura
+  }
+}
+
+async function loadAdminData() {
+  const rawAccounts = await storageGetSafe('sitio:cuentas', true);
+  try {
+    accounts = rawAccounts ? JSON.parse(rawAccounts) : null;
+  } catch (e) {
+    accounts = null;
+  }
+  if (!accounts) {
+    accounts = DEFAULT_ACCOUNTS;
+    await saveAccounts();
+  }
+  const rawItems = await storageGetSafe('sitio:items', true);
+  try {
+    items = rawItems ? JSON.parse(rawItems) : [];
+  } catch (e) {
+    items = [];
+  }
+  if (!Array.isArray(items)) items = [];
+
+  // Importa una sola vez el inventario inicial de pastillas ya incluido
+  // en este archivo. Así no se vuelve a crear si después se vacía a mano.
+  const inventoryInitialized = await storageGetSafe('sitio:inventario-inicializado', true);
+  if (!inventoryInitialized && items.length === 0) {
+    items = buildSeedItems();
+    await saveItems();
+  }
+  if (!inventoryInitialized) {
+    await storageSetRetry('sitio:inventario-inicializado', 'true', true);
+  }
+
+  const rawMoves = await storageGetSafe('sitio:movimientos', true);
+  try {
+    movements = rawMoves ? JSON.parse(rawMoves) : [];
+  } catch (e) {
+    movements = [];
+  }
+}
+
+async function saveAccounts() {
+  await storageSetRetry('sitio:cuentas', JSON.stringify(accounts), true);
+}
+async function saveItems() {
+  await storageSetRetry('sitio:items', JSON.stringify(items), true);
+}
+async function saveMovements() {
+  await storageSetRetry('sitio:movimientos', JSON.stringify(movements), true);
+}
+
+async function openAdmin() {
+  if (!accounts.length) await loadAdminData();
+  loginStep = 'select';
+  loginSelected = null;
+  loginError = '';
+  renderAdminRoot();
+}
+
+function closeLogin() {
+  loginStep = null;
+  renderAdminRoot();
+}
+
+function selectAccount(name) {
+  const acc = accounts.find(a => a.name === name);
+  loginSelected = acc;
+  loginError = '';
+  loginStep = acc.pin ? 'enterpin' : 'setpin';
+  renderAdminRoot();
+}
+
+async function submitSetPin(e) {
+  e.preventDefault();
+  const f = e.target;
+  const pin = f.querySelector('[name="pin"]').value.trim();
+  const pin2 = f.querySelector('[name="pin2"]').value.trim();
+  if (!pin || !pin2) { loginError = 'Completa los dos campos.'; renderAdminRoot(); return; }
+  if (pin.length !== 4 || !/^\d{4}$/.test(pin)) { loginError = 'El PIN debe tener exactamente 4 dígitos.'; renderAdminRoot(); return; }
+  if (pin !== pin2) { loginError = 'Los PIN no coinciden.'; renderAdminRoot(); return; }
+  const acc = accounts.find(a => a.name === loginSelected.name);
+  acc.pin = pin;
+
+  // Entramos al panel de inmediato; el guardado sigue pasando de fondo.
+  currentUser = acc;
+  loginStep = null;
+  toastMessage = '✓ PIN creado. ¡Bienvenido, ' + acc.name + '!';
+  renderAdminRoot();
+  setTimeout(() => { if (toastMessage.startsWith('✓')) { toastMessage = ''; renderAdminRoot(); } }, 4000);
+
+  const saved = await storageSetRetry('sitio:cuentas', JSON.stringify(accounts), true, 3);
+  if (!saved) {
+    toastMessage = '⚠ Tu PIN funciona por ahora, pero no se pudo guardar en el servidor. Vuelve a intentar crear sesión más tarde.';
+    renderAdminRoot();
+  }
+}
+
+function submitEnterPin(e) {
+  e.preventDefault();
+  const f = e.target;
+  const pin = f.querySelector('[name="pin"]').value.trim();
+  const acc = accounts.find(a => a.name === loginSelected.name);
+  if (pin !== acc.pin) {
+    loginError = 'PIN incorrecto.';
+    renderAdminRoot();
+    return;
+  }
+  currentUser = acc;
+  loginStep = null;
+  renderAdminRoot();
+}
+
+function logout() {
+  currentUser = null;
+  itemModal = null;
+  moveModal = null;
+  adminSearch = '';
+  toastMessage = '';
+  renderAdminRoot();
+}
+
+/* ---- Inventario dentro del panel ---- */
+function isAdmin() { return currentUser && currentUser.role === 'admin'; }
+
+function filteredAdminItems() {
+  let list = items;
+  if (adminSearch.trim()) {
+    const t = adminSearch.trim().toLowerCase();
+    // Las ubicaciones D1, D2... deben coincidir completas: buscar D3 no
+    // debe traer referencias cuyo nombre contiene D320, D350, etc.
+    const shelfCode = /^d\s*\d+$/i.test(t) ? t.replace(/\s/g, '') : null;
+    list = shelfCode
+      ? list.filter(i => (i.location || '').toLowerCase().replace(/\s/g, '') === shelfCode)
+      : list.filter(i =>
+          i.name.toLowerCase().includes(t) ||
+          (i.category || '').toLowerCase().includes(t) ||
+          (i.location || '').toLowerCase().includes(t)
+        );
+  }
+  return list.slice().sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function updateAdminSearch(value) {
+  adminSearch = value;
+  renderAdminRoot();
+  // renderAdminRoot reemplaza el campo; devolvemos el foco para que se pueda
+  // escribir una búsqueda completa sin tener que hacer clic tras cada letra.
+  requestAnimationFrame(() => {
+    const input = document.querySelector('.admin-search');
+    if (input) {
+      input.focus();
+      input.setSelectionRange(value.length, value.length);
+    }
+  });
+}
+
+function openNewItem() {
+  itemModal = { item: { id: null, name: '', category: '', location: '', quantity: 0, minStock: 1, unit: 'un', buyPrice: '', sellPrice: '' } };
+  renderAdminRoot();
+}
+function openEditItem(id) {
+  itemModal = { item: { ...items.find(i => i.id === id) } };
+  renderAdminRoot();
+}
+async function submitItemForm(e) {
+  e.preventDefault();
+  const f = e.target;
+  const val = (n) => f.querySelector('[name="' + n + '"]').value;
+  const data = {
+    id: itemModal.item.id || uid(),
+    name: val('name').trim(),
+    category: val('category').trim(),
+    location: val('location').trim(),
+    quantity: Number(val('quantity')) || 0,
+    minStock: Number(val('minStock')) || 0,
+    unit: val('unit').trim() || 'un',
+    buyPrice: val('buyPrice') ? Number(val('buyPrice')) : '',
+    sellPrice: val('sellPrice') ? Number(val('sellPrice')) : ''
+  };
+  if (!data.name) return;
+  const idx = items.findIndex(i => i.id === data.id);
+  if (idx >= 0) items[idx] = data; else items.push(data);
+  await saveItems();
+  itemModal = null;
+  renderAdminRoot();
+}
+async function deleteItem(id) {
+  const it = items.find(i => i.id === id);
+  if (!it || !confirm('¿Eliminar "' + it.name + '"?')) return;
+  items = items.filter(i => i.id !== id);
+  await saveItems();
+  renderAdminRoot();
+}
+function openMove(id) {
+  moveModal = { item: items.find(i => i.id === id), type: 'in' };
+  renderAdminRoot();
+}
+async function submitMove(e) {
+  e.preventDefault();
+  const f = e.target;
+  const qty = Number(f.querySelector('[name="qty"]').value);
+  if (!qty || qty <= 0) return;
+  const it = items.find(i => i.id === moveModal.item.id);
+  if (moveModal.type === 'out' && qty > it.quantity) {
+    alert('No puedes sacar más de lo disponible (' + it.quantity + ' ' + it.unit + ').');
+    return;
+  }
+  it.quantity += moveModal.type === 'in' ? qty : -qty;
+  movements.unshift({ id: uid(), itemId: it.id, itemName: it.name, type: moveModal.type, qty, note: f.querySelector('[name="note"]').value.trim(), user: currentUser.name, date: new Date().toISOString() });
+  movements = movements.slice(0, 200);
+  await saveItems();
+  await saveMovements();
+  moveModal = null;
+  renderAdminRoot();
+}
+
+function renderStockRow(it) {
+  const low = it.quantity <= it.minStock;
+  return `
+    <div class="stock-row ${low ? 'low' : ''}">
+      <div>
+        <div class="name">${escapeHtml(it.name)}</div>
+        <div class="meta">
+          ${it.category ? `<span>${escapeHtml(it.category)}</span>` : ''}
+          ${it.location ? `<span>📍 ${escapeHtml(it.location)}</span>` : ''}
+          ${low ? `<span style="color:var(--warn)">stock bajo</span>` : ''}
+        </div>
+      </div>
+      <div class="stock-qty">
+        <b class="${low ? 'low' : ''}">${it.quantity}</b>
+        <div class="u">${escapeHtml(it.unit)} · mín ${it.minStock}</div>
+      </div>
+      ${isAdmin() ? `
+        <div class="stock-price">
+          <b>${fmtMoney(it.sellPrice)}</b>
+          compra ${fmtMoney(it.buyPrice)}
+        </div>
+      ` : `<div></div>`}
+      <div class="stock-row-actions" style="grid-column: ${isAdmin() ? 'auto' : '3'};">
+        <button class="icon-btn" title="Registrar entrada/salida" onclick="openMove('${it.id}')" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--line);background:var(--surface-raised);color:var(--text);cursor:pointer;">⇅</button>
+        ${isAdmin() ? `
+          <button class="icon-btn" title="Editar" onclick="openEditItem('${it.id}')" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--line);background:var(--surface-raised);color:var(--text);cursor:pointer;">✎</button>
+          <button class="icon-btn" title="Eliminar" onclick="deleteItem('${it.id}')" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--line);background:var(--surface-raised);color:var(--text);cursor:pointer;">✕</button>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderItemModal() {
+  if (!itemModal) return '';
+  const it = itemModal.item;
+  const isNew = !it.id;
+  return `
+    <div class="admin-overlay" onclick="if(event.target===this){itemModal=null; renderAdminRoot();}">
+      <div class="admin-modal" style="max-width:440px; text-align:left;">
+        <h2>${isNew ? 'Agregar repuesto o herramienta' : 'Editar ' + escapeHtml(it.name)}</h2>
+        <form onsubmit="submitItemForm(event)" novalidate style="margin-top:16px;">
+          <div class="admin-field" style="text-align:left;">
+            <label>Nombre</label>
+            <input name="name" value="${escapeHtml(it.name)}" style="text-align:left; letter-spacing:normal; font-size:14px;" required autofocus />
+          </div>
+          <div style="display:flex; gap:10px;">
+            <div class="admin-field" style="flex:1; text-align:left;">
+              <label>Categoría</label>
+              <input name="category" value="${escapeHtml(it.category)}" style="text-align:left; letter-spacing:normal; font-size:14px;" />
+            </div>
+            <div class="admin-field" style="flex:1; text-align:left;">
+              <label>Ubicación</label>
+              <input name="location" value="${escapeHtml(it.location)}" style="text-align:left; letter-spacing:normal; font-size:14px;" />
+            </div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <div class="admin-field" style="flex:1; text-align:left;">
+              <label>Cantidad</label>
+              <input name="quantity" type="number" min="0" value="${it.quantity}" style="text-align:left; letter-spacing:normal; font-size:14px;" />
+            </div>
+            <div class="admin-field" style="flex:1; text-align:left;">
+              <label>Stock mínimo</label>
+              <input name="minStock" type="number" min="0" value="${it.minStock}" style="text-align:left; letter-spacing:normal; font-size:14px;" />
+            </div>
+            <div class="admin-field" style="flex:1; text-align:left;">
+              <label>Unidad</label>
+              <input name="unit" value="${escapeHtml(it.unit)}" style="text-align:left; letter-spacing:normal; font-size:14px;" />
+            </div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <div class="admin-field" style="flex:1; text-align:left;">
+              <label>Precio de compra</label>
+              <input name="buyPrice" type="number" min="0" value="${it.buyPrice}" style="text-align:left; letter-spacing:normal; font-size:14px;" />
+            </div>
+            <div class="admin-field" style="flex:1; text-align:left;">
+              <label>Precio de venta</label>
+              <input name="sellPrice" type="number" min="0" value="${it.sellPrice}" style="text-align:left; letter-spacing:normal; font-size:14px;" />
+            </div>
+          </div>
+          <div class="admin-modal-actions">
+            <button type="button" class="btn btn-outline" onclick="itemModal=null; renderAdminRoot();">Cancelar</button>
+            <button type="submit" class="btn btn-red">${isNew ? 'Agregar' : 'Guardar'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+function renderMoveModal() {
+  if (!moveModal) return '';
+  const it = moveModal.item;
+  return `
+    <div class="admin-overlay" onclick="if(event.target===this){moveModal=null; renderAdminRoot();}">
+      <div class="admin-modal" style="text-align:left;">
+        <h2>${escapeHtml(it.name)}</h2>
+        <div style="display:flex; gap:6px; margin:16px 0;">
+          <button type="button" onclick="moveModal.type='in'; renderAdminRoot();" class="btn ${moveModal.type==='in' ? 'btn-red' : 'btn-outline'}" style="flex:1; justify-content:center;">+ Entrada</button>
+          <button type="button" onclick="moveModal.type='out'; renderAdminRoot();" class="btn ${moveModal.type==='out' ? 'btn-red' : 'btn-outline'}" style="flex:1; justify-content:center;">− Salida</button>
+        </div>
+        <form onsubmit="submitMove(event)" novalidate>
+          <div class="admin-field" style="text-align:left;">
+            <label>Cantidad (actual: ${it.quantity} ${it.unit})</label>
+            <input name="qty" type="number" min="1" style="text-align:left; letter-spacing:normal; font-size:14px;" required autofocus />
+          </div>
+          <div class="admin-field" style="text-align:left;">
+            <label>Nota (opcional)</label>
+            <input name="note" style="text-align:left; letter-spacing:normal; font-size:14px;" />
+          </div>
+          <div class="admin-modal-actions">
+            <button type="button" class="btn btn-outline" onclick="moveModal=null; renderAdminRoot();">Cancelar</button>
+            <button type="submit" class="btn btn-red">Registrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+function renderAdminPanel() {
+  const list = filteredAdminItems();
+  const lowCount = items.filter(i => i.quantity <= i.minStock).length;
+  return `
+    <div class="admin-panel">
+      <div class="admin-panel-inner">
+        <div class="admin-header">
+          <div>
+            <h1>Panel de administración</h1>
+            <div class="who">Hola, <b>${escapeHtml(currentUser.name)}</b> · ${escapeHtml(currentUser.roleLabel)}</div>
+          </div>
+          <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
+        </div>
+
+        ${toastMessage ? `<div style="background:var(--surface); border:1px solid var(--brass); color:var(--brass); padding:10px 14px; border-radius:6px; font-size:13.5px; margin-bottom:16px;">${escapeHtml(toastMessage)}</div>` : ''}
+
+        <div class="admin-tabs" aria-label="Secciones de administración">
+          <button class="admin-tab" type="button">Inventario</button>
+        </div>
+
+        <div class="admin-toolbar">
+          <input class="admin-search" placeholder="Buscar por nombre, categoría o ubicación…" value="${escapeHtml(adminSearch)}" oninput="updateAdminSearch(this.value)" />
+          ${isAdmin() ? `<button class="btn btn-red" onclick="openNewItem()">+ Agregar</button>` : ''}
+        </div>
+
+        ${lowCount ? `<p style="color:var(--warn); font-size:13.5px; margin-bottom:14px;">⚠ ${lowCount} referencia(s) con stock bajo</p>` : ''}
+
+        ${list.length ? list.map(renderStockRow).join('') : `
+          <div class="admin-empty">
+            ${items.length === 0 ? 'Aún no hay nada en el inventario.' : 'No hay resultados para tu búsqueda.'}
+          </div>
+        `}
+      </div>
+      ${renderItemModal()}
+      ${renderMoveModal()}
+    </div>
+  `;
+}
+
+function renderLogin() {
+  if (loginStep === 'select') {
+    return `
+      <div class="admin-overlay" onclick="if(event.target===this) closeLogin();">
+        <div class="admin-modal">
+          <h2>Acceso administración</h2>
+          <div class="sub">Selecciona tu nombre para continuar.</div>
+          <div class="admin-name-list">
+            ${accounts.map(a => `
+              <button class="admin-name-btn" onclick="selectAccount('${a.name}')">
+                ${escapeHtml(a.name)} <span class="role">${escapeHtml(a.roleLabel)}</span>
+              </button>
+            `).join('')}
+          </div>
+          <button class="admin-back" onclick="closeLogin()">Cancelar</button>
+        </div>
+      </div>
+    `;
+  }
+  if (loginStep === 'setpin') {
+    return `
+      <div class="admin-overlay" onclick="if(event.target===this) closeLogin();">
+        <div class="admin-modal">
+          <h2>Hola, ${escapeHtml(loginSelected.name)}</h2>
+          <div class="sub">Es tu primera vez. Crea el PIN de 4 dígitos que vas a usar para entrar.</div>
+          <form onsubmit="submitSetPin(event)" novalidate>
+            <div class="admin-field">
+              <label>Nuevo PIN</label>
+              <input name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autofocus />
+            </div>
+            <div class="admin-field">
+              <label>Confirma el PIN</label>
+              <input name="pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
+            </div>
+            <div class="admin-error">${loginError}</div>
+            <div class="admin-modal-actions">
+              <button type="button" class="btn btn-outline" onclick="loginStep='select'; renderAdminRoot();">Atrás</button>
+              <button type="submit" class="btn btn-red">Crear PIN y entrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+  }
+  if (loginStep === 'enterpin') {
+    return `
+      <div class="admin-overlay" onclick="if(event.target===this) closeLogin();">
+        <div class="admin-modal">
+          <h2>Hola, ${escapeHtml(loginSelected.name)}</h2>
+          <div class="sub">Ingresa tu PIN.</div>
+          <form onsubmit="submitEnterPin(event)" novalidate>
+            <div class="admin-field">
+              <label>PIN</label>
+              <input name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autofocus />
+            </div>
+            <div class="admin-error">${loginError}</div>
+            <div class="admin-modal-actions">
+              <button type="button" class="btn btn-outline" onclick="loginStep='select'; renderAdminRoot();">Atrás</button>
+              <button type="submit" class="btn btn-red">Entrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+  }
+  return '';
+}
+
+function renderAdminRoot() {
+  const root = document.getElementById('adminRoot');
+  if (currentUser) {
+    root.innerHTML = renderAdminPanel();
+  } else if (loginStep) {
+    root.innerHTML = renderLogin();
+  } else {
+    root.innerHTML = '';
+  }
+}
+
+loadAdminData();
+</script>
+
+</body>
+</html>
