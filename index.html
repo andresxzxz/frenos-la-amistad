@@ -239,9 +239,11 @@
     border-radius: 1px;
   }
   .service-card p { color: var(--text-dim); font-size: 14.5px; }
+  .service-card:last-child:nth-child(odd) { grid-column: span 2; }
 
   @media (max-width: 640px) {
     .services-grid { grid-template-columns: 1fr; }
+    .service-card:last-child:nth-child(odd) { grid-column: auto; }
   }
 
   /* GARANTIA */
@@ -298,6 +300,8 @@
   }
   .contact-block a.value { text-decoration: none; }
   .contact-block a.value:hover { color: var(--red); }
+  .navigation-options { display: flex; gap: 10px; flex-wrap: wrap; margin: -12px 0 26px; }
+  .navigation-options .btn { padding: 10px 14px; font-size: 13.5px; }
 
   .hours-table { width: 100%; border-collapse: collapse; font-size: 15px; }
   .hours-table td { padding: 8px 0; border-bottom: 1px solid var(--line); }
@@ -527,10 +531,6 @@
       <p>Diagnóstico y reparación de fallas mecánicas comunes, mantenimiento preventivo y revisión antes de viajar.</p>
     </div>
     <div class="service-card">
-      <h3>Revisión antes de comprar</h3>
-      <p>¿Vas a comprar un carro usado? Te ayudamos a revisar el estado mecánico antes de cerrar el negocio.</p>
-    </div>
-    <div class="service-card">
       <h3>Asesoría sin compromiso</h3>
       <p>Si no estás seguro de qué le pasa a tu carro, cuéntanos por WhatsApp y te orientamos antes de que vengas al taller.</p>
     </div>
@@ -561,6 +561,10 @@
       <a class="value" href="https://www.google.com/maps/search/?api=1&query=Carrera+79c+bis+%232-21+Bogot%C3%A1" target="_blank" rel="noopener" style="display:block;">
         Carrera 79c bis #2-21, Bogotá D.C.
       </a>
+      <div class="navigation-options" aria-label="Elige una aplicación para llegar al taller">
+        <a class="btn btn-red" href="https://www.google.com/maps/dir/?api=1&destination=Carrera+79c+bis+%232-21%2C+Bogot%C3%A1&travelmode=driving&dir_action=navigate" target="_blank" rel="noopener">Ir con Google Maps</a>
+        <a class="btn btn-outline" href="https://www.waze.com/ul?q=Carrera%2079c%20bis%20%232-21%2C%20Bogot%C3%A1&navigate=yes" target="_blank" rel="noopener">Ir con Waze</a>
+      </div>
 
       <h3>Teléfono / WhatsApp</h3>
       <a class="value" href="#" onclick="openWhatsAppAppointment(); return false;">321 353 6368</a>
