@@ -581,6 +581,7 @@
 
 <div id="adminRoot"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* Abre WhatsApp con una plantilla lista para completar y enviar. */
 function openWhatsAppAppointment() {
@@ -589,19 +590,22 @@ function openWhatsAppAppointment() {
   window.open(url, '_blank', 'noopener');
 }
 /* ================= ADMINISTRACIÓN ================= */
-const DEFAULT_ACCOUNTS = [
-  { name: 'Nelson', role: 'admin', roleLabel: 'CEO', pin: null },
-  { name: 'Paola', role: 'admin', roleLabel: 'Gerente General', pin: null },
-  { name: 'Grillo', role: 'employee', roleLabel: 'Empleado', pin: null }
-];
+/*
+  CONFIGURACION SUPABASE
+  Pega aquí la URL del proyecto y la Publishable key (nunca la secret key).
+  Ambas se encuentran en Supabase: Project Settings > API.
+*/
+const SUPABASE_URL = 'https://rtnncqnsmksszucjqodj.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_QDzFR426dFwIW5_CviOeCw__3cUCTTi';
+const supabaseConfigured =
+  SUPABASE_URL.startsWith('https://') &&
+  !SUPABASE_PUBLISHABLE_KEY.startsWith('PEGA_AQUI');
+const db = supabaseConfigured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
 
-let accounts = [];
 let items = [];
 let movements = [];
 let currentUser = null; // { name, role, roleLabel }
 
-let loginStep = null; // 'select' | 'setpin' | 'enterpin'
-let loginSelected = null;
 let loginError = '';
 
 let itemModal = null; // { item }
@@ -695,8 +699,8 @@ function buildSeedItems() {
     quantity,
     minStock: 1,
     unit: 'caja',
-    buyPrice: '',
-    sellPrice: ''
+    buyPrice: null,
+    sellPrice: null
   }));
 }
 function escapeHtml(s) {
@@ -876,6 +880,123 @@ function logout() {
   moveModal = null;
   adminSearch = '';
   toastMessage = '';
+  renderAdminRoot();
+}
+
+/* ---- Sesión segura y datos en Supabase ---- */
+function roleLabel(role) {
+  return role === 'admin' ? 'Administrador' : 'Empleado';
+}
+
+async function loadCurrentUser() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { currentUser = null; return; }
+  const { data: profile, error } = await db
+    .from('profiles')
+    .select('name, role')
+    .eq('id', user.id)
+    .single();
+  if (error || !profile) throw new Error('Tu cuenta no tiene un perfil autorizado.');
+  currentUser = { id: user.id, name: profile.name, role: profile.role, roleLabel: roleLabel(profile.role) };
+}
+
+async function loadAdminData() {
+  if (!supabaseConfigured) return;
+  try {
+    await loadCurrentUser();
+    if (!currentUser) return;
+    const { data, error } = await db.from('items').select('*').order('name');
+    if (error) throw error;
+    items = data || [];
+    if (items.length === 0 && isAdmin()) {
+      const initialItems = buildSeedItems();
+      const { error: seedError } = await db.from('items').upsert(initialItems);
+      if (seedError) throw seedError;
+      items = initialItems;
+    }
+  } catch (error) {
+    console.error(error);
+    toastMessage = 'No fue posible cargar los datos seguros: ' + error.message;
+  }
+}
+
+async function openAdmin() {
+  loginError = '';
+  if (!supabaseConfigured) {
+    loginError = 'Falta conectar Supabase. Completa la configuración indicada en el archivo.';
+    renderAdminRoot();
+    return;
+  }
+  await loadAdminData();
+  renderAdminRoot();
+}
+
+function closeLogin() { loginError = ''; renderAdminRoot(); }
+
+async function submitLogin(e) {
+  e.preventDefault();
+  const form = e.target;
+  const email = form.querySelector('[name="email"]').value.trim();
+  const password = form.querySelector('[name="password"]').value;
+  loginError = '';
+  const { error } = await db.auth.signInWithPassword({ email, password });
+  if (error) {
+    loginError = 'Correo o contraseña incorrectos.';
+    renderAdminRoot();
+    return;
+  }
+  await loadAdminData();
+  if (!currentUser) loginError = 'Esta cuenta no tiene permiso para usar el panel.';
+  renderAdminRoot();
+}
+
+async function logout() {
+  if (supabaseConfigured) await db.auth.signOut();
+  currentUser = null;
+  items = [];
+  movements = [];
+  itemModal = null;
+  moveModal = null;
+  adminSearch = '';
+  toastMessage = '';
+  renderAdminRoot();
+}
+
+async function saveItems() {
+  // PostgreSQL no acepta una cadena vacía como precio numérico. Los precios
+  // aún no definidos se guardan como null y se muestran como “—” en el panel.
+  const itemsToSave = items.map(item => ({
+    ...item,
+    buyPrice: item.buyPrice === '' ? null : item.buyPrice,
+    sellPrice: item.sellPrice === '' ? null : item.sellPrice
+  }));
+  const { error } = await db.from('items').upsert(itemsToSave);
+  if (error) throw error;
+}
+
+async function deleteItem(id) {
+  const it = items.find(i => i.id === id);
+  if (!it || !confirm('¿Eliminar "' + it.name + '"?')) return;
+  const { error } = await db.from('items').delete().eq('id', id);
+  if (error) { alert('No se pudo eliminar: ' + error.message); return; }
+  items = items.filter(i => i.id !== id);
+  renderAdminRoot();
+}
+
+async function submitMove(e) {
+  e.preventDefault();
+  const form = e.target;
+  const qty = Number(form.querySelector('[name="qty"]').value);
+  if (!qty || qty <= 0) return;
+  const { error } = await db.rpc('record_inventory_movement', {
+    p_item_id: moveModal.item.id,
+    p_type: moveModal.type,
+    p_qty: qty,
+    p_note: form.querySelector('[name="note"]').value.trim()
+  });
+  if (error) { alert('No se pudo registrar el movimiento: ' + error.message); return; }
+  moveModal = null;
+  await loadAdminData();
   renderAdminRoot();
 }
 
@@ -1210,6 +1331,47 @@ function renderAdminRoot() {
   } else {
     root.innerHTML = '';
   }
+}
+
+/* Esta versión sustituye el acceso local por autenticación de Supabase. */
+function renderLogin() {
+  return `
+    <div class="admin-overlay" onclick="if(event.target===this) closeLogin();">
+      <div class="admin-modal">
+        <h2>Acceso administración</h2>
+        <div class="sub">Ingresa con tu correo y contraseña autorizados.</div>
+        <form onsubmit="submitLogin(event)" novalidate>
+          <div class="admin-field" style="text-align:left;">
+            <label>Correo electrónico</label>
+            <input name="email" type="email" autocomplete="email" placeholder="nombre@correo.com" style="text-align:left; letter-spacing:normal; font-size:14px;" required autofocus />
+          </div>
+          <div class="admin-field" style="text-align:left;">
+            <label>Contraseña</label>
+            <input name="password" type="password" autocomplete="current-password" style="text-align:left; letter-spacing:normal; font-size:14px;" required />
+          </div>
+          <div class="admin-error">${escapeHtml(loginError)}</div>
+          <div class="admin-modal-actions">
+            <button type="button" class="btn btn-outline" onclick="closeLogin()">Cancelar</button>
+            <button type="submit" class="btn btn-red">Entrar</button>
+          </div>
+        </form>
+        ${supabaseConfigured ? '<button class="admin-back" onclick="requestPasswordReset()">Olvidé mi contraseña</button>' : ''}
+      </div>
+    </div>
+  `;
+}
+
+async function requestPasswordReset() {
+  const email = prompt('Escribe tu correo para recibir el enlace de recuperación:');
+  if (!email) return;
+  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+  loginError = error ? 'No fue posible solicitar el cambio de contraseña.' : 'Revisa tu correo para cambiar la contraseña.';
+  renderAdminRoot();
+}
+
+function renderAdminRoot() {
+  const root = document.getElementById('adminRoot');
+  root.innerHTML = currentUser ? renderAdminPanel() : renderLogin();
 }
 
 loadAdminData();
