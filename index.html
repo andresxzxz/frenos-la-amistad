@@ -607,6 +607,7 @@ let movements = [];
 let currentUser = null; // { name, role, roleLabel }
 
 let loginError = '';
+let adminOpen = false;
 
 let itemModal = null; // { item }
 let moveModal = null; // { item }
@@ -921,6 +922,7 @@ async function loadAdminData() {
 }
 
 async function openAdmin() {
+  adminOpen = true;
   loginError = '';
   if (!supabaseConfigured) {
     loginError = 'Falta conectar Supabase. Completa la configuración indicada en el archivo.';
@@ -931,7 +933,11 @@ async function openAdmin() {
   renderAdminRoot();
 }
 
-function closeLogin() { loginError = ''; renderAdminRoot(); }
+function closeLogin() {
+  adminOpen = false;
+  loginError = '';
+  renderAdminRoot();
+}
 
 async function submitLogin(e) {
   e.preventDefault();
@@ -953,6 +959,7 @@ async function submitLogin(e) {
 async function logout() {
   if (supabaseConfigured) await db.auth.signOut();
   currentUser = null;
+  adminOpen = false;
   items = [];
   movements = [];
   itemModal = null;
@@ -1361,17 +1368,14 @@ function renderLogin() {
   `;
 }
 
-async function requestPasswordReset() {
-  const email = prompt('Escribe tu correo para recibir el enlace de recuperación:');
-  if (!email) return;
-  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
-  loginError = error ? 'No fue posible solicitar el cambio de contraseña.' : 'Revisa tu correo para cambiar la contraseña.';
+function requestPasswordReset() {
+  loginError = 'Si olvidaste tu contraseña, comunícate directamente con el dueño.';
   renderAdminRoot();
 }
 
 function renderAdminRoot() {
   const root = document.getElementById('adminRoot');
-  root.innerHTML = currentUser ? renderAdminPanel() : renderLogin();
+  root.innerHTML = currentUser ? renderAdminPanel() : (adminOpen ? renderLogin() : '');
 }
 
 loadAdminData();
