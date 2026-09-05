@@ -246,6 +246,26 @@
     .service-card:last-child:nth-child(odd) { grid-column: auto; }
   }
 
+  /* SEGURIDAD Y CONFIANZA */
+  .warning-section { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .warning-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .warning-item { background: var(--bg); border: 1px solid var(--line); padding: 16px; font-size: 14px; color: var(--text-dim); }
+  .warning-item b { color: var(--text); display: block; margin-bottom: 3px; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .gallery-placeholder { min-height: 170px; background: var(--surface); border: 1px dashed var(--line); border-radius: 6px; padding: 22px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .gallery-placeholder .gallery-icon { font-size: 24px; margin-bottom: 10px; }
+  .gallery-placeholder b { font-size: 15px; }
+  .gallery-placeholder span { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+  .reviews { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .reviews .container { display: flex; gap: 28px; align-items: center; justify-content: space-between; }
+  .reviews p { color: var(--text-dim); max-width: 55ch; font-size: 15px; }
+
+  @media (max-width: 640px) {
+    .warning-grid, .gallery-grid { grid-template-columns: 1fr; }
+    .reviews .container { display: block; }
+    .reviews .btn { margin-top: 18px; }
+  }
+
   /* GARANTIA */
   .warranty {
     background: var(--surface);
@@ -466,6 +486,7 @@
       <p class="lead">Reparación mecánica general con enfoque en frenos de calidad, hechos por gente que lleva dos décadas debajo del carro.</p>
       <div class="hero-actions">
         <a class="btn btn-red" href="#" onclick="openWhatsAppAppointment(); return false;">Agendar por WhatsApp</a>
+        <a class="btn btn-outline" href="tel:+573213536368">Llamar ahora</a>
         <a class="btn btn-outline" href="#contacto">Ver ubicación y horario</a>
       </div>
     </div>
@@ -534,6 +555,45 @@
       <h3>Asesoría sin compromiso</h3>
       <p>Si no estás seguro de qué le pasa a tu carro, cuéntanos por WhatsApp y te orientamos antes de que vengas al taller.</p>
     </div>
+  </div>
+</section>
+
+<section class="warning-section" aria-labelledby="senales-frenos">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="senales-frenos">No ignores estas señales</h2>
+      <p>Si notas alguno de estos síntomas al frenar, escríbenos o llámanos para revisar tu vehículo.</p>
+    </div>
+    <div class="warning-grid">
+      <div class="warning-item"><b>Chirridos o sonidos metálicos</b>Puede ser momento de revisar pastillas o discos.</div>
+      <div class="warning-item"><b>El carro vibra al frenar</b>Conviene revisar el sistema antes de que el problema aumente.</div>
+      <div class="warning-item"><b>Pedal muy duro o muy suave</b>Es una señal para revisar el sistema de frenos cuanto antes.</div>
+      <div class="warning-item"><b>Testigo de frenos encendido</b>No lo dejes pasar: agenda una revisión con el taller.</div>
+    </div>
+  </div>
+</section>
+
+<section id="galeria">
+  <div class="container">
+    <div class="section-head">
+      <h2>Trabajos reales, paso a paso</h2>
+      <p>Muy pronto compartiremos fotos de reparaciones hechas en el taller. Preferimos mostrar trabajo real, no imágenes de catálogo.</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-placeholder"><div class="gallery-icon">🔧</div><b>Diagnóstico</b><span>Revisión inicial del vehículo.</span></div>
+      <div class="gallery-placeholder"><div class="gallery-icon">⚙️</div><b>Proceso de reparación</b><span>Fotos del trabajo mientras se realiza.</span></div>
+      <div class="gallery-placeholder"><div class="gallery-icon">✓</div><b>Trabajo terminado</b><span>Resultado final listo para entregar.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="reviews" id="opiniones">
+  <div class="container">
+    <div>
+      <h2>Tu opinión nos ayuda a mejorar</h2>
+      <p>Cuando nos visites, cuéntanos cómo fue tu experiencia. Las opiniones reales ayudan a otros conductores a encontrar un taller de confianza.</p>
+    </div>
+    <a class="btn btn-outline" href="https://www.google.com/maps/search/?api=1&query=Carrera+79c+bis+%232-21+Bogot%C3%A1" target="_blank" rel="noopener">Ver ubicación en Google</a>
   </div>
 </section>
 
@@ -608,6 +668,7 @@ const db = supabaseConfigured ? window.supabase.createClient(SUPABASE_URL, SUPAB
 
 let items = [];
 let movements = [];
+let appointments = [];
 let currentUser = null; // { name, role, roleLabel }
 
 let loginError = '';
@@ -615,6 +676,8 @@ let adminOpen = false;
 
 let itemModal = null; // { item }
 let moveModal = null; // { item }
+let appointmentModal = false;
+let adminTab = 'inventory';
 let adminSearch = '';
 let toastMessage = '';
 
@@ -1008,6 +1071,60 @@ async function submitMove(e) {
   if (error) { alert('No se pudo registrar el movimiento: ' + error.message); return; }
   moveModal = null;
   await loadAdminData();
+  renderAdminRoot();
+}
+
+async function changeAdminTab(tab) {
+  adminTab = tab;
+  if (tab === 'appointments') await loadAppointments();
+  renderAdminRoot();
+}
+
+async function loadAppointments() {
+  const { data, error } = await db
+    .from('appointments')
+    .select('id, requested_service, preferred_date, status, created_at, clients(name, phone, vehicle_make, vehicle_model, plate, notes)')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error(error);
+    toastMessage = 'Para usar Clientes y citas, ejecuta primero el archivo supabase-clientes-citas.sql en Supabase.';
+    appointments = [];
+    return;
+  }
+  appointments = data || [];
+}
+
+function openAppointmentModal() {
+  appointmentModal = true;
+  renderAdminRoot();
+}
+
+async function submitAppointment(e) {
+  e.preventDefault();
+  const form = e.target;
+  const value = name => form.querySelector('[name="' + name + '"]').value.trim();
+  const client = {
+    name: value('name'), phone: value('phone'), vehicle_make: value('vehicle_make'),
+    vehicle_model: value('vehicle_model'), plate: value('plate').toUpperCase(), notes: value('notes')
+  };
+  if (!client.name || !client.phone) return;
+  const { data: savedClient, error: clientError } = await db.from('clients').insert(client).select('id').single();
+  if (clientError) { alert('No se pudo guardar el cliente: ' + clientError.message); return; }
+  const { error: appointmentError } = await db.from('appointments').insert({
+    client_id: savedClient.id,
+    requested_service: value('service'),
+    preferred_date: value('preferred_date') || null
+  });
+  if (appointmentError) { alert('No se pudo guardar la cita: ' + appointmentError.message); return; }
+  appointmentModal = false;
+  await loadAppointments();
+  renderAdminRoot();
+}
+
+async function updateAppointmentStatus(id, status) {
+  const { error } = await db.from('appointments').update({ status }).eq('id', id);
+  if (error) { alert('No se pudo actualizar la cita: ' + error.message); return; }
+  await loadAppointments();
   renderAdminRoot();
 }
 
