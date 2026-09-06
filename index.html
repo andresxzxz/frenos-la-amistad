@@ -653,7 +653,8 @@ function openWhatsAppAppointment() {
   const url = 'https://api.whatsapp.com/send?phone=573213536368&text=' + encodeURIComponent(message);
   window.open(url, '_blank', 'noopener');
 }
-/* ================= ADMINISTRACIÓN ================= */
+
+/* ================= ADMINISTRACIÓN (Supabase: correo + contraseña) ================= */
 /*
   CONFIGURACION SUPABASE
   Pega aquí la URL del proyecto y la Publishable key (nunca la secret key).
@@ -667,15 +668,14 @@ const supabaseConfigured =
 const db = supabaseConfigured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
 
 let items = [];
-let movements = [];
 let appointments = [];
-let currentUser = null; // { name, role, roleLabel }
+let currentUser = null; // { id, name, role, roleLabel }
 
 let loginError = '';
 let adminOpen = false;
 
 let itemModal = null; // { item }
-let moveModal = null; // { item }
+let moveModal = null; // { item, type }
 let appointmentModal = false;
 let adminTab = 'inventory';
 let adminSearch = '';
@@ -755,10 +755,174 @@ const SEED_ITEMS = [
   ["Pastilla freno Brake USA Ref. 8400-D1202 (Hyundai Santa Fe delantera)", "D22", 1],
   ["Pastilla freno Brake Pak Ref. 3568BPH", "D22", 2],
   ["Pastilla freno Brake USA Ref. 7947-D1044 (Ford Focus II / Ecosport 4x4 / Mazda 3 / Volvo C70-S40)", "D22", 1],
-  ["Pastilla freno Premium Metallic Ref. 7265-D376 (Chevrolet Lumina / Buick / Pontiac Gran Prix)", "D23", 2]
+  ["Pastilla freno Premium Metallic Ref. 7265-D376 (Chevrolet Lumina / Buick / Pontiac Gran Prix)", "D23", 2],
+
+  // Nuevos datos del inventario en zonas D24-D46
+  ["Pastilla freno Silver Ref. MKD-791", "D24", 4],
+  ["Pastilla freno BMW 320 B318 - Ref. 17437M", "D24", 2],
+  ["Pastilla freno Ref. 7437-D558F", "D24", 1],
+  ["Pastilla freno Ref. 7244-D351", "D24", 1],
+
+  ["Pastilla freno BMW 320 B318 / 17437M", "D25", 2],
+  ["Pastilla freno Ref. 10318-FF", "D25", 2],
+  ["Pastilla freno Ref. 7766-D1888H", "D25", 1],
+
+  ["Pastilla freno Ref. 7345-D412", "D26", 2],
+  ["Pastilla freno Ref. 7416-D468", "D26", 1],
+  ["Pastilla freno Brake Pak Ref. 3578BPR", "D26", 1],
+
+  ["Pastilla freno Ref. 7456-D", "D27", 1],
+  ["Pastilla freno Ref. 7459-FF", "D27", 1],
+  ["Pastilla freno Ref. 7459-D680", "D27", 2],
+
+  ["Pastilla freno Ref. 7529-D451", "D28", 2],
+  ["Pastilla freno Ref. 7558-D680", "D28", 2],
+  ["Pastilla freno Ref. 7558-FF", "D28", 1],
+
+  ["Pastilla freno Ref. 7753-FF", "D29", 3],
+  ["Pastilla freno Ref. 7759-D680", "D29", 2],
+  ["Pastilla freno Ref. 8132-D1194H", "D29", 2],
+
+  ["Pastilla freno Ref. 8769-D1500H", "D30", 3],
+  ["Pastilla freno Ref. 8766-D1303A", "D30", 2],
+  ["Pastilla freno Ref. 8307-USA-CER", "D30", 2],
+
+  ["Pastilla freno Ref. 7753-FF", "D31", 3],
+  ["Pastilla freno Ref. 7414-D1297", "D31", 2],
+  ["Pastilla freno Ref. 7681-D808", "D31", 1],
+
+  ["Pastilla freno Ref. 7367-D1303A", "D32", 2],
+  ["Pastilla freno Ref. 8451-D1340", "D32", 2],
+  ["Pastilla freno Ref. 7117-D194", "D32", 1],
+
+  ["Pastilla freno Ref. 7453-D473", "D33", 2],
+  ["Pastilla freno Ref. 7353-D473", "D33", 2],
+  ["Pastilla freno Ref. 7459-D680", "D33", 1],
+
+  ["Pastilla freno Ref. 7453-D473", "D34", 2],
+  ["Pastilla freno Ref. 8451-D1340", "D34", 1],
+  ["Pastilla freno Ref. 7117-D194", "D34", 1],
+
+  ["Pastilla freno Ref. 8876-D350", "D35", 2],
+  ["Pastilla freno Ref. 8877-D350", "D35", 1],
+
+  ["Pastilla freno Ref. 8987-D1759", "D36", 3],
+  ["Pastilla freno Ref. 6987-D1759", "D36", 2],
+  ["Pastilla freno Ref. 7558-FF", "D36", 1],
+
+  ["Pastilla freno Ref. 8878-D1759", "D37", 2],
+  ["Pastilla freno Ref. 8451-D1340", "D37", 1],
+  ["Pastilla freno Ref. 7780-D2160", "D37", 1],
+
+  ["Pastilla freno Ref. 9535-D483", "D38", 1],
+  ["Pastilla freno Ref. 8878-D1759", "D38", 2],
+
+  ["Pastilla freno Ref. 8878-D1759", "D39", 2],
+  ["Pastilla freno Ref. 8677-D1500H", "D39", 1],
+
+  ["Pastilla freno Ref. 7559-D680", "D40", 2],
+  ["Pastilla freno Ref. 7462-D997", "D40", 2],
+
+  ["Pastilla freno Ref. 7691-D808", "D41", 2],
+  ["Pastilla freno Ref. 7569-D680", "D41", 1],
+
+  ["Pastilla freno Ref. 7879-D1165", "D42", 2],
+  ["Pastilla freno Ref. 7027-Montero", "D42", 1],
+
+  ["Pastilla freno Ref. 7543-D473", "D43", 2],
+  ["Pastilla freno Ref. 7543-D473 / 3 Sky", "D43", 1],
+
+  ["Pastilla freno Ref. 1759-8987", "D44", 2],
+  ["Pastilla freno Ref. 7134-D1707", "D44", 1],
+
+  ["Pastilla freno Ref. 8987-D1759", "D45", 3],
+  ["Pastilla freno Ref. 8879-D1759", "D45", 2],
+
+  ["Pastilla freno Ref. 7859-D1707", "D46", 2],
+  ["Pastilla freno Ref. 8987-D1759", "D46", 2],
+  ["Pastilla freno Ref. 7681-D808", "D46", 1],
+
+  // Nuevos inventarios visibles en las fotos recientes (D47-D67)
+  ["Pastilla freno Brake Pak Ref. 8849 / 8831 AASS (Toyota Corolla 2009)", "D47", 1],
+  ["Pastilla freno Gold Brake Pads / Balatas Ref. GMKD 934 / I7837GM", "D48", 1],
+  ["Pastilla freno Renosa Ref. 10207 Montero", "D49", 1],
+  ["Pastilla freno Renosa Ref. 10218 / 10214 (Renosa)", "D50", 2],
+  ["Pastilla freno Renosa Ref. 10218 / 10217", "D51", 2],
+  ["Pastilla freno Renosa Ref. 10212 / 10218", "D52", 2],
+  ["Pastilla freno Renosa Ref. 10207 / 10212", "D53", 2],
+  ["Pastilla freno Ref. 10218-72 / 10214-72 (Renosa)", "D54", 2],
+  ["Pastilla freno Ref. 10218 / 10207 (Renosa)", "D55", 2],
+  ["Pastilla freno Ref. 10229 / 10218 (Renosa)", "D56", 2],
+  ["Pastilla freno Renosa Ref. 10229 / 10212", "D57", 1],
+  ["Pastilla freno Mitsubishi L200 / BEX-USA (01/06)", "D57", 1],
+  ["Pastilla freno Gold Brake Pads / Balatas Ref. 7463", "D58", 2],
+  ["Pastilla freno Ref. 10207 / 10218 / 10212 (Renosa)", "D59", 2],
+  ["Pastilla freno Ref. 10217 / 10218 (Renosa)", "D60", 2],
+  ["Pastilla freno Renosa Ref. 10207A / 10218", "D61", 1],
+  ["Pastilla freno Renosa Ref. 10212 / 10218", "D62", 2],
+  ["Pastilla freno Ref. K99003-CR / 1072 D181M", "D67", 2],
+  ["Pastilla freno Ref. 7072 / D181M", "D67", 2],
+
+  // Nuevas referencias por ubicación exacta en fotos recientes (D68-D90)
+  ["Pastilla freno Ref. 7952-D1049F (Honda Accord 04/08)", "D68", 1],
+  ["Pastilla freno Ref. 10289 FF (Incolbest)", "D68", 1],
+  ["Pastilla freno Brake USA Ref. 8908-D1679H", "D68", 1],
+
+  ["Pastilla freno Ref. F1452H / Renault Master II / III", "D70", 1],
+  ["Pastilla freno Ref. 029 FF", "D70", 2],
+  ["Pastilla freno Ref. 020 / LADI", "D70", 1],
+
+  ["Pastilla freno Ref. BEX-USA 8287", "D72", 1],
+  ["Pastilla freno Renosa Ref. 10214-72 / 10212-72", "D72", 2],
+  ["Pastilla freno Ref. 8287 / 1013", "D72", 1],
+
+  ["Pastilla freno BEX-USA Ref. 8322 / 8322BPA", "D73", 1],
+  ["Pastilla freno Ref. 7827 / 7827-1", "D73", 1],
+
+  ["Pastilla freno Ref. 10206 / 10202 / 10215 (Novex)", "D74", 2],
+  ["Pastilla freno Ref. 10206 / 10202", "D74", 1],
+
+  ["Pastilla freno Ref. 7525-D633 / FT8610D", "D75", 1],
+  ["Pastilla freno Ref. 7808 / 52", "D75", 1],
+
+  ["Pastilla freno Ref. 7916-1012 BPH", "D76", 1],
+  ["Pastilla freno Ref. 10206 / 10202 (Novex)", "D76", 1],
+
+  ["Pastilla freno Ref. 7433-D459 / 7433D459 / 7433D459B", "D77", 2],
+  ["Pastilla freno Ref. 10206 / 10202 (Novex)", "D77", 1],
+
+  ["Pastilla freno Ref. 10206 / 10202 / 10215 (Novex)", "D78", 2],
+  ["Pastilla freno Ref. 10206 / 10202", "D78", 1],
+
+  ["Pastilla freno Ref. 10206 / 10215 / 10202", "D79", 1],
+  ["Pastilla freno Ref. 10215 / 10202", "D79", 1],
+  ["Pastilla freno Ref. 10206 / 10215", "D79", 1],
+
+  ["Pastilla freno Ref. 10215 / 10206 (Novex)", "D80", 2],
+  ["Pastilla freno Ref. 10206 / 10202", "D80", 1],
+
+  ["Pastilla freno Ref. 10206 / 10202 / 10215 (Novex)", "D81", 2],
+  ["Pastilla freno Ref. 7600 / 7601", "D81", 1],
+
+  ["Pastilla freno Ref. 10206 / 10202", "D82", 2],
+  ["Pastilla freno Ref. 10206 / 10215 (Novex)", "D82", 1],
+
+  ["Pastilla freno Ref. 8819-D1663H (Audi Q5 13/)", "D83", 1],
+  ["Pastilla freno Ref. 8527-D1413F (Hyundai Genesis 10-/)", "D83", 1],
+  ["Pastilla freno Ref. 7081-D149", "D83", 2],
+
+  ["Pastilla freno Renosa Ref. 079-72", "D85", 1],
+  ["Pastilla freno Ref. 079 (Incolbest)", "D85", 2],
+
+  ["Pastilla freno Ref. 0730-D490 / 7370-D490", "D89", 2],
+  ["Pastilla freno Ref. 7370-D490 / LPB", "D89", 1],
+
+  ["Pastilla freno Ref. 0730-D490 / 7370-D490", "D90", 2],
+  ["Pastilla freno Ref. 7370-D490 / LPB", "D90", 1]
 ];
 
 function buildSeedItems() {
+  const now = new Date().toISOString();
   return SEED_ITEMS.map(([name, location, quantity]) => ({
     id: uid(),
     name,
@@ -768,7 +932,9 @@ function buildSeedItems() {
     minStock: 1,
     unit: 'caja',
     buyPrice: null,
-    sellPrice: null
+    sellPrice: null,
+    created_at: now,
+    updated_at: now
   }));
 }
 function escapeHtml(s) {
@@ -779,177 +945,12 @@ function fmtMoney(n) {
   return '$' + Number(n).toLocaleString('es-CO');
 }
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
 window.addEventListener('error', (ev) => {
   console.error('Error en el panel de administración:', ev.message);
 });
 window.addEventListener('unhandledrejection', (ev) => {
   console.error('Error en el panel de administración:', ev.reason);
 });
-
-async function storageSetRetry(key, value, shared, retries) {
-  retries = retries === undefined ? 2 : retries;
-  // En una página publicada normalmente no existe window.storage. En ese
-  // caso guardamos en el navegador para que el inicio de sesión funcione.
-  if (!window.storage || typeof window.storage.set !== 'function') {
-    try {
-      localStorage.setItem(key, value);
-      return true;
-    } catch (e) {
-      console.error('No se pudo guardar "' + key + '" localmente', e);
-      return null;
-    }
-  }
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      await window.storage.set(key, value, shared);
-      return true;
-    } catch (e) {
-      if (attempt === retries) {
-        console.error('No se pudo guardar "' + key + '" tras varios intentos', e);
-        return null;
-      }
-      await sleep(400 * (attempt + 1));
-    }
-  }
-  return null;
-}
-
-async function storageGetSafe(key, shared) {
-  if (!window.storage || typeof window.storage.get !== 'function') {
-    try {
-      return localStorage.getItem(key);
-    } catch (e) {
-      console.error('No se pudo leer "' + key + '" localmente', e);
-      return null;
-    }
-  }
-  try {
-    const res = await window.storage.get(key, shared);
-    return res ? res.value : null;
-  } catch (e) {
-    return null; // la clave no existe todavía, o falla puntual de lectura
-  }
-}
-
-async function loadAdminData() {
-  const rawAccounts = await storageGetSafe('sitio:cuentas', true);
-  try {
-    accounts = rawAccounts ? JSON.parse(rawAccounts) : null;
-  } catch (e) {
-    accounts = null;
-  }
-  if (!accounts) {
-    accounts = DEFAULT_ACCOUNTS;
-    await saveAccounts();
-  }
-  const rawItems = await storageGetSafe('sitio:items', true);
-  try {
-    items = rawItems ? JSON.parse(rawItems) : [];
-  } catch (e) {
-    items = [];
-  }
-  if (!Array.isArray(items)) items = [];
-
-  // Importa una sola vez el inventario inicial de pastillas ya incluido
-  // en este archivo. Así no se vuelve a crear si después se vacía a mano.
-  const inventoryInitialized = await storageGetSafe('sitio:inventario-inicializado', true);
-  if (!inventoryInitialized && items.length === 0) {
-    items = buildSeedItems();
-    await saveItems();
-  }
-  if (!inventoryInitialized) {
-    await storageSetRetry('sitio:inventario-inicializado', 'true', true);
-  }
-
-  const rawMoves = await storageGetSafe('sitio:movimientos', true);
-  try {
-    movements = rawMoves ? JSON.parse(rawMoves) : [];
-  } catch (e) {
-    movements = [];
-  }
-}
-
-async function saveAccounts() {
-  await storageSetRetry('sitio:cuentas', JSON.stringify(accounts), true);
-}
-async function saveItems() {
-  await storageSetRetry('sitio:items', JSON.stringify(items), true);
-}
-async function saveMovements() {
-  await storageSetRetry('sitio:movimientos', JSON.stringify(movements), true);
-}
-
-async function openAdmin() {
-  if (!accounts.length) await loadAdminData();
-  loginStep = 'select';
-  loginSelected = null;
-  loginError = '';
-  renderAdminRoot();
-}
-
-function closeLogin() {
-  loginStep = null;
-  renderAdminRoot();
-}
-
-function selectAccount(name) {
-  const acc = accounts.find(a => a.name === name);
-  loginSelected = acc;
-  loginError = '';
-  loginStep = acc.pin ? 'enterpin' : 'setpin';
-  renderAdminRoot();
-}
-
-async function submitSetPin(e) {
-  e.preventDefault();
-  const f = e.target;
-  const pin = f.querySelector('[name="pin"]').value.trim();
-  const pin2 = f.querySelector('[name="pin2"]').value.trim();
-  if (!pin || !pin2) { loginError = 'Completa los dos campos.'; renderAdminRoot(); return; }
-  if (pin.length !== 4 || !/^\d{4}$/.test(pin)) { loginError = 'El PIN debe tener exactamente 4 dígitos.'; renderAdminRoot(); return; }
-  if (pin !== pin2) { loginError = 'Los PIN no coinciden.'; renderAdminRoot(); return; }
-  const acc = accounts.find(a => a.name === loginSelected.name);
-  acc.pin = pin;
-
-  // Entramos al panel de inmediato; el guardado sigue pasando de fondo.
-  currentUser = acc;
-  loginStep = null;
-  toastMessage = '✓ PIN creado. ¡Bienvenido, ' + acc.name + '!';
-  renderAdminRoot();
-  setTimeout(() => { if (toastMessage.startsWith('✓')) { toastMessage = ''; renderAdminRoot(); } }, 4000);
-
-  const saved = await storageSetRetry('sitio:cuentas', JSON.stringify(accounts), true, 3);
-  if (!saved) {
-    toastMessage = '⚠ Tu PIN funciona por ahora, pero no se pudo guardar en el servidor. Vuelve a intentar crear sesión más tarde.';
-    renderAdminRoot();
-  }
-}
-
-function submitEnterPin(e) {
-  e.preventDefault();
-  const f = e.target;
-  const pin = f.querySelector('[name="pin"]').value.trim();
-  const acc = accounts.find(a => a.name === loginSelected.name);
-  if (pin !== acc.pin) {
-    loginError = 'PIN incorrecto.';
-    renderAdminRoot();
-    return;
-  }
-  currentUser = acc;
-  loginStep = null;
-  renderAdminRoot();
-}
-
-function logout() {
-  currentUser = null;
-  itemModal = null;
-  moveModal = null;
-  adminSearch = '';
-  toastMessage = '';
-  renderAdminRoot();
-}
 
 /* ---- Sesión segura y datos en Supabase ---- */
 function roleLabel(role) {
@@ -976,6 +977,21 @@ async function loadAdminData() {
     const { data, error } = await db.from('items').select('*').order('name');
     if (error) throw error;
     items = data || [];
+
+    const seedItems = buildSeedItems();
+    const existingKeys = new Set(
+      items.map(it => `${(it.name || '').trim()}::${(it.location || '').trim()}`)
+    );
+    const missingSeeds = seedItems.filter(seed =>
+      !existingKeys.has(`${seed.name}::${seed.location}`)
+    );
+
+    if (missingSeeds.length > 0) {
+      const { error: seedError } = await db.from('items').upsert(missingSeeds);
+      if (seedError) throw seedError;
+      items = [...items, ...missingSeeds];
+    }
+
     if (items.length === 0 && isAdmin()) {
       const initialItems = buildSeedItems();
       const { error: seedError } = await db.from('items').upsert(initialItems);
@@ -1009,17 +1025,25 @@ function closeLogin() {
 async function submitLogin(e) {
   e.preventDefault();
   const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
   const email = form.querySelector('[name="email"]').value.trim();
   const password = form.querySelector('[name="password"]').value;
   loginError = '';
-  const { error } = await db.auth.signInWithPassword({ email, password });
-  if (error) {
-    loginError = 'Correo o contraseña incorrectos.';
-    renderAdminRoot();
-    return;
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Entrando…'; }
+  try {
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    if (error) {
+      console.error('Error de Supabase al iniciar sesión:', error);
+      loginError = error.message || 'Correo o contraseña incorrectos.';
+      renderAdminRoot();
+      return;
+    }
+    await loadAdminData();
+    if (!currentUser) loginError = 'Esta cuenta inició sesión pero no tiene un perfil autorizado en la tabla "profiles".';
+  } catch (err) {
+    console.error('Error inesperado al iniciar sesión:', err);
+    loginError = 'No se pudo conectar con el servidor: ' + (err && err.message ? err.message : err);
   }
-  await loadAdminData();
-  if (!currentUser) loginError = 'Esta cuenta no tiene permiso para usar el panel.';
   renderAdminRoot();
 }
 
@@ -1028,7 +1052,6 @@ async function logout() {
   currentUser = null;
   adminOpen = false;
   items = [];
-  movements = [];
   itemModal = null;
   moveModal = null;
   adminSearch = '';
@@ -1037,14 +1060,17 @@ async function logout() {
 }
 
 async function saveItems() {
-  // PostgreSQL no acepta una cadena vacía como precio numérico. Los precios
-  // aún no definidos se guardan como null y se muestran como “—” en el panel.
+  // PostgreSQL exige created_at/updated_at y no acepta cadenas vacías como
+  // precio. Estos campos se completan aquí para que el guardado funcione.
+  const now = new Date().toISOString();
   const itemsToSave = items.map(item => ({
     ...item,
+    created_at: item.created_at || now,
+    updated_at: now,
     buyPrice: item.buyPrice === '' ? null : item.buyPrice,
     sellPrice: item.sellPrice === '' ? null : item.sellPrice
   }));
-  const { error } = await db.from('items').upsert(itemsToSave);
+  const { error } = await db.from('items').upsert(itemsToSave, { onConflict: 'id' });
   if (error) throw error;
 }
 
@@ -1175,6 +1201,7 @@ async function submitItemForm(e) {
   e.preventDefault();
   const f = e.target;
   const val = (n) => f.querySelector('[name="' + n + '"]').value;
+  const now = new Date().toISOString();
   const data = {
     id: itemModal.item.id || uid(),
     name: val('name').trim(),
@@ -1184,42 +1211,25 @@ async function submitItemForm(e) {
     minStock: Number(val('minStock')) || 0,
     unit: val('unit').trim() || 'un',
     buyPrice: val('buyPrice') ? Number(val('buyPrice')) : '',
-    sellPrice: val('sellPrice') ? Number(val('sellPrice')) : ''
+    sellPrice: val('sellPrice') ? Number(val('sellPrice')) : '',
+    created_at: itemModal.item.created_at || now,
+    updated_at: now
   };
   if (!data.name) return;
-  const idx = items.findIndex(i => i.id === data.id);
-  if (idx >= 0) items[idx] = data; else items.push(data);
-  await saveItems();
-  itemModal = null;
-  renderAdminRoot();
-}
-async function deleteItem(id) {
-  const it = items.find(i => i.id === id);
-  if (!it || !confirm('¿Eliminar "' + it.name + '"?')) return;
-  items = items.filter(i => i.id !== id);
-  await saveItems();
-  renderAdminRoot();
+  try {
+    const idx = items.findIndex(i => i.id === data.id);
+    if (idx >= 0) items[idx] = data; else items.push(data);
+    await saveItems();
+    itemModal = null;
+    renderAdminRoot();
+  } catch (error) {
+    console.error('No se pudo guardar el ítem:', error);
+    toastMessage = 'No se pudo guardar el cambio: ' + (error?.message || error);
+    renderAdminRoot();
+  }
 }
 function openMove(id) {
   moveModal = { item: items.find(i => i.id === id), type: 'in' };
-  renderAdminRoot();
-}
-async function submitMove(e) {
-  e.preventDefault();
-  const f = e.target;
-  const qty = Number(f.querySelector('[name="qty"]').value);
-  if (!qty || qty <= 0) return;
-  const it = items.find(i => i.id === moveModal.item.id);
-  if (moveModal.type === 'out' && qty > it.quantity) {
-    alert('No puedes sacar más de lo disponible (' + it.quantity + ' ' + it.unit + ').');
-    return;
-  }
-  it.quantity += moveModal.type === 'in' ? qty : -qty;
-  movements.unshift({ id: uid(), itemId: it.id, itemName: it.name, type: moveModal.type, qty, note: f.querySelector('[name="note"]').value.trim(), user: currentUser.name, date: new Date().toISOString() });
-  movements = movements.slice(0, 200);
-  await saveItems();
-  await saveMovements();
-  moveModal = null;
   renderAdminRoot();
 }
 
@@ -1382,86 +1392,6 @@ function renderAdminPanel() {
   `;
 }
 
-function renderLogin() {
-  if (loginStep === 'select') {
-    return `
-      <div class="admin-overlay" onclick="if(event.target===this) closeLogin();">
-        <div class="admin-modal">
-          <h2>Acceso administración</h2>
-          <div class="sub">Selecciona tu nombre para continuar.</div>
-          <div class="admin-name-list">
-            ${accounts.map(a => `
-              <button class="admin-name-btn" onclick="selectAccount('${a.name}')">
-                ${escapeHtml(a.name)} <span class="role">${escapeHtml(a.roleLabel)}</span>
-              </button>
-            `).join('')}
-          </div>
-          <button class="admin-back" onclick="closeLogin()">Cancelar</button>
-        </div>
-      </div>
-    `;
-  }
-  if (loginStep === 'setpin') {
-    return `
-      <div class="admin-overlay" onclick="if(event.target===this) closeLogin();">
-        <div class="admin-modal">
-          <h2>Hola, ${escapeHtml(loginSelected.name)}</h2>
-          <div class="sub">Es tu primera vez. Crea el PIN de 4 dígitos que vas a usar para entrar.</div>
-          <form onsubmit="submitSetPin(event)" novalidate>
-            <div class="admin-field">
-              <label>Nuevo PIN</label>
-              <input name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autofocus />
-            </div>
-            <div class="admin-field">
-              <label>Confirma el PIN</label>
-              <input name="pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" />
-            </div>
-            <div class="admin-error">${loginError}</div>
-            <div class="admin-modal-actions">
-              <button type="button" class="btn btn-outline" onclick="loginStep='select'; renderAdminRoot();">Atrás</button>
-              <button type="submit" class="btn btn-red">Crear PIN y entrar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-  }
-  if (loginStep === 'enterpin') {
-    return `
-      <div class="admin-overlay" onclick="if(event.target===this) closeLogin();">
-        <div class="admin-modal">
-          <h2>Hola, ${escapeHtml(loginSelected.name)}</h2>
-          <div class="sub">Ingresa tu PIN.</div>
-          <form onsubmit="submitEnterPin(event)" novalidate>
-            <div class="admin-field">
-              <label>PIN</label>
-              <input name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autofocus />
-            </div>
-            <div class="admin-error">${loginError}</div>
-            <div class="admin-modal-actions">
-              <button type="button" class="btn btn-outline" onclick="loginStep='select'; renderAdminRoot();">Atrás</button>
-              <button type="submit" class="btn btn-red">Entrar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-  }
-  return '';
-}
-
-function renderAdminRoot() {
-  const root = document.getElementById('adminRoot');
-  if (currentUser) {
-    root.innerHTML = renderAdminPanel();
-  } else if (loginStep) {
-    root.innerHTML = renderLogin();
-  } else {
-    root.innerHTML = '';
-  }
-}
-
-/* Esta versión sustituye el acceso local por autenticación de Supabase. */
 function renderLogin() {
   return `
     <div class="admin-overlay" onclick="if(event.target===this) closeLogin();">
